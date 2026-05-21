@@ -368,99 +368,33 @@ address { font-style: normal; }
 }
 .hero__scroll:hover { color: var(--secondary); }
 
-@media (max-width: 1024px) {
-  .hero__body {
-    grid-template-columns: 1fr;
-    padding-top: 48px;
-    padding-bottom: 64px;
-  }
-  .hero__visual {
-    position: relative;
-    justify-content: center;
-    margin-top: 32px;
-    max-width: 360px;
-  }
-  .hero__visual img {
-    max-width: 360px;
-  }
+.hero__visual--full {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  width: 100vw;
+  max-width: 100vw;
+  position: relative;
+  z-index: 2;
+  margin: 0 auto;
+  padding-top: var(--header-h);
 }
-
-@media (min-width: 1025px) {
-  .hero__body {
-    max-width: 1180px;
-    padding-right: 560px;
-  }
-  .hero__visual {
-    position: absolute;
-    top: 50%;
-    right: 24px;
-    width: 520px;
-    margin: 0;
-    transform: translateY(-50%);
-  }
-  .hero__visual img {
-    width: 100%;
-    max-width: 520px;
-    transform: translateY(0);
-  }
+.hero__visual--full img {
+  width: 100vw;
+  max-width: 100vw;
+  height: auto;
+  display: block;
+  object-fit: contain;
 }
 
 @media (max-width: 768px) {
-  .hero__stats {
-    grid-template-columns: 1fr 1fr;
-    gap: 14px;
-    margin: 24px 0 0 0;
-    justify-items: stretch;
+  .hero__visual--full {
+    padding-top: 68px;
   }
-  .hero__stat {
-    width: 95%;
-    min-width: 0;
+  .hero__visual--full img {
+    width: 100vw;
     max-width: 100vw;
-    height: 90px;
-    margin: 0 auto;
-    padding: 12px 8px 8px 8px;
-    font-size: 15px;
-    border-radius: 16px;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: center;
-    box-sizing: border-box;
-  }
-  .hero__stat strong {
-    font-size: 22px;
-    margin-bottom: 2px;
-    color: var(--secondary);
-  }
-  .hero__stat span {
-    font-size: 13px;
-    text-align: left;
-    line-height: 1.2;
-    color: #fff;
-    opacity: 0.95;
-  }
-  .hero__visual {
-    position: absolute;
-    top: 24px;
-    right: 12px;
-    left: auto;
-    width: 110px;
-    max-width: 30vw;
-    z-index: 2;
-    transform: none;
-    margin: 0;
-    pointer-events: none;
-  }
-  .hero__visual img {
-    width: 100%;
-    max-width: 110px;
-    min-width: 80px;
-    border-radius: 16px;
-    box-shadow: 0 8px 24px rgba(0,0,0,.25);
-  }
-  .hero__content {
-    margin-top: 40px;
-    padding-top: 0;
+    height: auto;
   }
 }
 
