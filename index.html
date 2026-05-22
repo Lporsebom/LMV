@@ -299,67 +299,147 @@
           <h2 class="section__title">Obras que mostram a experiência da LMV na prática</h2>
           <p class="section__subtitle">Cada projeto entregue é a prova do nosso compromisso com qualidade, prazo e satisfação do cliente.</p>
         </div>
-        <div class="portfolio__grid">
-          <article class="portfolio__card portfolio__card--featured">
-            <div class="portfolio__img-wrap">
-              <img src="imagens/Portfolio1.png" alt="Residência Alto Padrão em Piracicaba" loading="lazy" />
-              <span class="portfolio__tag">Destaque</span>
+        
+        <div class="portfolio__carousel-container">
+          <div class="portfolio__carousel" id="portfolioCarousel">
+            <!-- Projeto 1 -->
+            <div class="portfolio__carousel-item">
+              <div class="portfolio__card">
+                <div class="portfolio__carousel-images">
+                  <div class="portfolio__main-image">
+                    <img id="mainImg1" src="imagens/portfolio1.png" alt="Residência Alto Padrão em Piracicaba" loading="lazy" />
+                    <span class="portfolio__tag">Destaque</span>
+                    <button class="carousel__nav-btn carousel__prev" onclick="changeImage(1, -1)">❮</button>
+                    <button class="carousel__nav-btn carousel__next" onclick="changeImage(1, 1)">❯</button>
+                  </div>
+                  <div class="carousel__thumbnails" id="thumbnails1">
+                    <img src="imagens/portfolio1.png" alt="Foto 1" class="thumb active" onclick="setCurrentImage(1, 0)">
+                    <img src="imagens/portfolio11.png" alt="Foto 2" class="thumb" onclick="setCurrentImage(1, 1)">
+                    <img src="imagens/portfolio111.png" alt="Foto 3" class="thumb" onclick="setCurrentImage(1, 2)">
+                  </div>
+                </div>
+                <div class="portfolio__info">
+                  <h3>Residência Alto Padrão</h3>
+                  <p><i class="fa-solid fa-location-dot"></i> Piracicaba, SP</p>
+                  <span class="portfolio__type">Construção do Zero</span>
+                </div>
+              </div>
             </div>
-            <div class="portfolio__info">
-              <h3>Residência Alto Padrão</h3>
-              <p><i class="fa-solid fa-location-dot"></i> Piracicaba, SP</p>
-              <span class="portfolio__type">Construção do Zero</span>
+
+            <!-- Projeto 2 -->
+            <div class="portfolio__carousel-item">
+              <div class="portfolio__card">
+                <div class="portfolio__carousel-images">
+                  <div class="portfolio__main-image">
+                    <img id="mainImg2" src="imagens/portfolio2.png" alt="Reforma Residencial Completa" loading="lazy" />
+                    <span class="portfolio__tag">Reforma</span>
+                    <button class="carousel__nav-btn carousel__prev" onclick="changeImage(2, -1)">❮</button>
+                    <button class="carousel__nav-btn carousel__next" onclick="changeImage(2, 1)">❯</button>
+                  </div>
+                  <div class="carousel__thumbnails" id="thumbnails2">
+                    <img src="imagens/portfolio2.png" alt="Foto 1" class="thumb active" onclick="setCurrentImage(2, 0)">
+                    <img src="imagens/portfolio22.png" alt="Foto 2" class="thumb" onclick="setCurrentImage(2, 1)">
+                    <img src="imagens/portfolio222.png" alt="Foto 3" class="thumb" onclick="setCurrentImage(2, 2)">
+                  </div>
+                </div>
+                <div class="portfolio__info">
+                  <h3>Reforma Residencial</h3>
+                  <p><i class="fa-solid fa-location-dot"></i> Piracicaba, SP</p>
+                  <span class="portfolio__type">Reforma e Melhoria</span>
+                </div>
+              </div>
             </div>
-          </article>
-          <article class="portfolio__card">
-            <div class="portfolio__img-wrap">
-              <img src="imagens/Portfolio2.png" alt="Reforma Residencial Completa" loading="lazy" />
-              <span class="portfolio__tag">Reforma</span>
+
+            <!-- Projeto 3 -->
+            <div class="portfolio__carousel-item">
+              <div class="portfolio__card">
+                <div class="portfolio__carousel-images">
+                  <div class="portfolio__main-image">
+                    <img id="mainImg3" src="imagens/portfolio3.png" alt="Projeto Executado pela LMV" loading="lazy" />
+                    <span class="portfolio__tag">Executado</span>
+                    <button class="carousel__nav-btn carousel__prev" onclick="changeImage(3, -1)">❮</button>
+                    <button class="carousel__nav-btn carousel__next" onclick="changeImage(3, 1)">❯</button>
+                  </div>
+                  <div class="carousel__thumbnails" id="thumbnails3">
+                    <img src="imagens/portfolio3.png" alt="Foto 1" class="thumb active" onclick="setCurrentImage(3, 0)">
+                    <img src="imagens/portfolio33.png" alt="Foto 2" class="thumb" onclick="setCurrentImage(3, 1)">
+                    <img src="imagens/portfolio333.png" alt="Foto 3" class="thumb" onclick="setCurrentImage(3, 2)">
+                  </div>
+                </div>
+                <div class="portfolio__info">
+                  <h3>Construção Residencial</h3>
+                  <p>Av. Armando Césare Dedini, 1472</p>
+                  <p>Vila Rezende, Piracicaba - SP</p>
+                  <p>CEP - 13405-268</p>
+                  <p>Construído em: 2001</p>
+                  
+                </div>
+              </div>
             </div>
-            <div class="portfolio__info">
-              <h3>Reforma Residencial</h3>
-              <p><i class="fa-solid fa-location-dot"></i> Piracicaba, SP</p>
-              <span class="portfolio__type">Reforma e Melhoria</span>
+
+            <!-- Projeto 4 -->
+            <div class="portfolio__carousel-item">
+              <div class="portfolio__card">
+                <div class="portfolio__carousel-images">
+                  <div class="portfolio__main-image">
+                    <img id="mainImg4" src="imagens/portfolio4.png" alt="Casa Moderna entregue pela LMV" loading="lazy" />
+                    <span class="portfolio__tag">Entregue</span>
+                    <button class="carousel__nav-btn carousel__prev" onclick="changeImage(4, -1)">❮</button>
+                    <button class="carousel__nav-btn carousel__next" onclick="changeImage(4, 1)">❯</button>
+                  </div>
+                  <div class="carousel__thumbnails" id="thumbnails4">
+                    <img src="imagens/portfolio4.png" alt="Foto 1" class="thumb active" onclick="setCurrentImage(4, 0)">
+                    <img src="imagens/portfolio44.png" alt="Foto 2" class="thumb" onclick="setCurrentImage(4, 1)">
+                    <img src="imagens/portfolio444.png" alt="Foto 3" class="thumb" onclick="setCurrentImage(4, 2)">
+                  </div>
+                </div>
+                <div class="portfolio__info">
+                  <h3>Casa Moderna</h3>
+                  <p><i class="fa-solid fa-location-dot"></i> Piracicaba, SP</p>
+                  <span class="portfolio__type">Construção Residencial</span>
+                </div>
+              </div>
             </div>
-            
-          </article>
-          <article class="portfolio__card">
-            <div class="portfolio__img-wrap">
-              <img src="imagens/Portfolio3.png" alt="Projeto Executado pela LMV" loading="lazy" />
-              <span class="portfolio__tag">Executado</span>
+
+            <!-- Projeto 5 -->
+            <div class="portfolio__carousel-item">
+              <div class="portfolio__card">
+                <div class="portfolio__carousel-images">
+                  <div class="portfolio__main-image">
+                    <img id="mainImg5" src="imagens/portfolio5.png" alt="Projeto em Execução pela LMV" loading="lazy" />
+                    <span class="portfolio__tag">Em Execução</span>
+                    <button class="carousel__nav-btn carousel__prev" onclick="changeImage(5, -1)">❮</button>
+                    <button class="carousel__nav-btn carousel__next" onclick="changeImage(5, 1)">❯</button>
+                  </div>
+                  <div class="carousel__thumbnails" id="thumbnails5">
+                    <img src="imagens/portfolio5.png" alt="Foto 1" class="thumb active" onclick="setCurrentImage(5, 0)">
+                    <img src="imagens/portfolio55.png" alt="Foto 2" class="thumb" onclick="setCurrentImage(5, 1)">
+                    <img src="imagens/portfolio555.png" alt="Foto 3" class="thumb" onclick="setCurrentImage(5, 2)">
+                  </div>
+                </div>
+                <div class="portfolio__info">
+                  <h3>Projeto em Execução</h3>
+                  <p><i class="fa-solid fa-location-dot"></i> Piracicaba e Região</p>
+                  <span class="portfolio__type">Gestão de Obra</span>
+                </div>
+              </div>
             </div>
-            <div class="portfolio__info">
-              <h3>Construção de casa residencial</h3>
-              <p>Av. Armando Césare Dedini, 1472</p>
-              <p>Vila Rezende, Piracicaba - SP</p> 
-              <p>CEP - 13405-268</p> 
-              <p>Construído em: 2001</p> 
-            </div>
-            
-          </article>
-          <article class="portfolio__card">
-            <div class="portfolio__img-wrap">
-              <img src="imagens/Portfolio4.png" alt="Casa Moderna entregue pela LMV" loading="lazy" />
-              <span class="portfolio__tag">Entregue</span>
-            </div>
-            <div class="portfolio__info">
-              <h3>Casa Moderna</h3>
-              <p><i class="fa-solid fa-location-dot"></i> Piracicaba, SP</p>
-              <span class="portfolio__type">Construção Residencial</span>
-            </div>
-          </article>
-          <article class="portfolio__card">
-            <div class="portfolio__img-wrap">
-              <img src="imagens/Portfolio5.png" alt="Projeto em Execução pela LMV" loading="lazy" />
-              <span class="portfolio__tag">Em Execução</span>
-            </div>
-            <div class="portfolio__info">
-              <h3>Projeto em Execução</h3>
-              <p><i class="fa-solid fa-location-dot"></i> Piracicaba e Região</p>
-              <span class="portfolio__type">Gestão de Obra</span>
-            </div>
-          </article>
+          </div>
+
+          <!-- Botões de navegação do carrossel principal -->
+          <button class="carousel__main-prev" onclick="scrollCarousel(-1)">❮</button>
+          <button class="carousel__main-next" onclick="scrollCarousel(1)">❯</button>
         </div>
+
+        <!-- Indicadores do carrossel -->
+        <div class="carousel__indicators" id="carouselIndicators">
+          <span class="indicator active" onclick="goToSlide(0)"></span>
+          <span class="indicator" onclick="goToSlide(1)"></span>
+          <span class="indicator" onclick="goToSlide(2)"></span>
+          <span class="indicator" onclick="goToSlide(3)"></span>
+          <span class="indicator" onclick="goToSlide(4)"></span>
+        </div>
+
         <div class="portfolio__cta">
           <a href="#contato" class="btn btn--outline">QUERO UM PROJETO COMO ESSE <i class="fa-solid fa-arrow-right"></i></a>
         </div>
