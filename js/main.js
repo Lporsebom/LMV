@@ -236,3 +236,161 @@
   }
 
 })();
+
+// ==================== PORTFOLIO CARROSSEL ====================
+let currentSlide = 0;
+const carousel = document.getElementById('portfolioCarousel');
+const indicators = document.querySelectorAll('.indicator');
+const slides = document.querySelectorAll('.portfolio__carousel-item');
+
+// Configuração dos arrays de imagens para cada projeto
+const projectImages = {
+  1: ['portfolio1.png', 'portfolio11.png', 'portfolio111.png'],
+  2: ['portfolio2.png', 'portfolio22.png', 'portfolio222.png'],
+  3: ['portfolio3.png', 'portfolio33.png', 'portfolio333.png'],
+  4: ['portfolio4.png', 'portfolio44.png', 'portfolio444.png'],
+  5: ['portfolio5.png', 'portfolio55.png', 'portfolio555.png']
+};
+
+// Estado atual de cada projeto
+let currentImageIndex = {
+  1: 0,
+  2: 0,
+  3: 0,
+  4: 0,
+  5: 0
+};
+
+// Função para mudar a imagem de um projeto específico
+function changeImage(projectId, direction) {
+  const images = projectImages[projectId];
+  if (!images) return;
+  
+  let newIndex = currentImageIndex[projectId] + direction;
+  if (newIndex < 0) newIndex = images.length - 1;
+  if (newIndex >= images.length) newIndex = 0;
+  
+  currentImageIndex[projectId] = newIndex;
+  
+  // Atualiza a imagem principal
+  const mainImg = document.getElementById(`mainImg${projectId}`);
+  if (mainImg) {
+    mainImg.src = `imagens/${images[newIndex]}`;
+  }
+  
+  // Atualiza as miniaturas ativas
+  const thumbnails = document.getElementById(`thumbnails${projectId}`);
+  if (thumbnails) {
+    const thumbs = thumbnails.querySelectorAll('.thumb');
+    thumbs.forEach((thumb, idx) => {
+      if (idx === newIndex) {
+        thumb.classList.add('active');
+      } else {
+        thumb.classList.remove('active');
+      }
+    });
+  }
+}
+
+// Função para definir a imagem atual diretamente
+function setCurrentImage(projectId, index) {
+  currentImageIndex[projectId] = index;
+  const images = projectImages[projectId];
+  if (!images) return;
+  
+  const mainImg = document.getElementById(`mainImg${projectId}`);
+  if (mainImg) {
+    mainImg.src = `imagens/${images[index]}`;
+  }
+  
+  const thumbnails = document.getElementById(`thumbnails${projectId}`);
+  if (thumbnails) {
+    const thumbs = thumbnails.querySelectorAll('.thumb');
+    thumbs.forEach((thumb, idx) => {
+      if (idx === index) {
+        thumb.classList.add('active');
+      } else {
+        thumb.classList.remove('active');
+      }
+    });
+  }
+}
+
+// Função para rolar o carrossel principal
+function scrollCarousel(direction) {
+  if (!carousel) return;
+  
+  const slideWidth = slides[0]?.offsetWidth || 0;
+  const gap = 24;
+  const scrollAmount = (slideWidth + gap) * direction;
+  
+  carousel.scrollBy({
+    left: scrollAmount,
+    behavior: 'smooth'
+  });
+  
+  // Atualiza os indicadores após o scroll
+  setTimeout(updateIndicators, 300);
+}
+
+// Função para ir para um slide específico
+function goToSlide(index) {
+  if (!carousel || !slides[index]) return;
+  
+  const slideWidth = slides[0].offsetWidth;
+  const gap = 24;
+  const scrollPosition = (slideWidth + gap) * index;
+  
+  carousel.scrollTo({
+    left: scrollPosition,
+    behavior: 'smooth'
+  });
+  
+  currentSlide = index;
+  updateIndicators();
+}
+
+// Função para atualizar os indicadores baseado no scroll
+function updateIndicators() {
+  if (!carousel || !slides.length) return;
+  
+  const scrollPosition = carousel.scrollLeft;
+  const slideWidth = slides[0].offsetWidth;
+  const gap = 24;
+  const slideTotalWidth = slideWidth + gap;
+  
+  let activeIndex = Math.round(scrollPosition / slideTotalWidth);
+  activeIndex = Math.min(activeIndex, slides.length - 1);
+  activeIndex = Math.max(activeIndex, 0);
+  
+  indicators.forEach((indicator, idx) => {
+    if (idx === activeIndex) {
+      indicator.classList.add('active');
+    } else {
+      indicator.classList.remove('active');
+    }
+  });
+  
+  currentSlide = activeIndex;
+}
+
+// Event listener para atualizar indicadores ao rolar
+if (carousel) {
+  carousel.addEventListener('scroll', updateIndicators);
+  window.addEventListener('resize', () => {
+    setTimeout(updateIndicators, 100);
+  });
+}
+
+// Inicializar o carrossel
+document.addEventListener('DOMContentLoaded', function() {
+  updateIndicators();
+  
+  // Pré-carregar imagens para melhor experiência
+  Object.values(projectImages).forEach(images => {
+    images.forEach(img => {
+      const preloadImg = new Image();
+      preloadImg.src = `imagens/${img}`;
+    });
+  });
+});
