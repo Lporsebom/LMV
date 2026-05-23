@@ -443,88 +443,117 @@ address { font-style: normal; }
     flex-direction: column;
     align-items: stretch;
     min-height: auto;
-    padding-top: 0;         /* o header fixo já ocupa espaço */
+    padding-top: 0;
     overflow: hidden;
   }
 
   /* bg e overlay ficam apenas na área da imagem */
   .hero__bg,
   .hero__overlay {
-    /* reposicionados para cobrir só o header-group */
     bottom: auto;
-    height: calc(56vw + var(--header-h) + 40px); /* proporcional à imagem */
+    height: calc(62vw + var(--header-h) + 60px);
   }
 
   /* ---- Bloco 1: imagem de título full-width ---- */
   .hero__header-group {
-    position: relative;       /* cria contexto de empilhamento */
+    position: relative;
     z-index: 1;
-    padding-top: var(--header-h);  /* empurra abaixo do header fixo */
+    padding-top: var(--header-h);
     width: 100%;
-    /* fundo da própria seção visível aqui (bg + overlay cobrem) */
   }
   .hero__city {
-    padding-top: 16px;
+    padding-top: 20px;
     font-size: 11px;
-    margin-bottom: 4px;
+    margin-bottom: 6px;
+    letter-spacing: .1em;
   }
   .hero__visual--title {
-    padding: 0;              /* sem padding lateral — borda a borda */
+    padding: 0;
     max-width: 100%;
   }
   .hero__visual--title img {
     width: 100%;
-    border-radius: 0;        /* sem bordas arredondadas no mobile */
+    border-radius: 0;
   }
 
   /* ---- Bloco 2: cards + botão ---- */
   .hero__body {
     position: relative;
     z-index: 2;
-    /* fundo sólido para destacar dos outros elementos */
     background: var(--primary);
     max-width: 100%;
-    padding: 28px 16px 40px;
+    padding: 36px 20px 52px;
     margin: 0;
-    gap: 20px;
+    gap: 24px;
   }
 
-  /* Grid de stats: 2 colunas compactas */
+  /* Separador visual sutil entre imagem e cards */
+  .hero__body::before {
+    content: '';
+    display: block;
+    width: 48px;
+    height: 3px;
+    background: var(--secondary);
+    border-radius: 100px;
+    margin: 0 auto -8px;
+  }
+
+  /* Grid de stats: 2 colunas mais espaçosas */
   .hero__stats {
     grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+    gap: 14px;
     margin-top: 0;
   }
   .hero__stat {
-    background: rgba(255,255,255,.08);
-    border-color: rgba(255,255,255,.15);
-    border-radius: 14px;
-    padding: 18px 16px;
+    background: rgba(255,255,255,.09);
+    border-color: rgba(255,255,255,.16);
+    border-radius: 16px;
+    padding: 22px 18px;
     min-width: 0;
   }
   .hero__stat strong {
-    font-size: 28px;
-    margin-bottom: 4px;
+    font-size: 30px;
+    margin-bottom: 6px;
   }
-  .hero__stat span { font-size: 13px; }
+  .hero__stat span {
+    font-size: 13px;
+    line-height: 1.4;
+    opacity: .88;
+  }
 
-  /* Botão full-width centralizado */
-  .hero__cta-wrap { margin-top: 4px; }
+  /* Botão full-width centralizado com mais destaque */
+  .hero__cta-wrap { margin-top: 8px; }
   .hero__cta-wrap .btn {
     width: 100%;
     justify-content: center;
     font-size: 15px;
-    padding: 16px 20px;
+    padding: 18px 20px;
+    border-radius: 12px;
+    letter-spacing: .02em;
   }
 
-  /* hero scroll handled in the hero mobile block above */
+  /* Esconde seta de scroll no mobile para não poluir */
+  .hero__scroll { display: none; }
+}
+
+/* Ajuste intermediário: tablet pequeno */
+@media (min-width: 481px) and (max-width: 768px) {
+  .hero__body {
+    padding: 44px 32px 60px;
+  }
+  .hero__stats { gap: 16px; }
+  .hero__stat { padding: 26px 22px; }
+  .hero__stat strong { font-size: 34px; }
 }
 
 /* Ajuste fino para telas muito pequenas */
 @media (max-width: 400px) {
-  .hero__stat strong { font-size: 24px; }
+  .hero__body { padding: 28px 16px 44px; gap: 18px; }
+  .hero__stats { gap: 10px; }
+  .hero__stat strong { font-size: 26px; }
   .hero__stat span   { font-size: 12px; }
-  .hero__stat        { padding: 14px 12px; }
+  .hero__stat        { padding: 16px 14px; }
+  .hero__cta-wrap .btn { font-size: 14px; padding: 16px 16px; }
 }
 
 /* ==================== PROBLEMS ==================== */
@@ -1026,6 +1055,20 @@ address { font-style: normal; }
 }
 .location__cities { margin-bottom: 32px; }
 .location__cities h3 { font-size: 18px; font-weight: 700; margin-bottom: 20px; text-align: center; }
+
+.location__content-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  align-items: start;
+  margin-bottom: 32px;
+}
+.location__map h3 { font-size: 18px; font-weight: 700; margin-bottom: 20px; text-align: center; }
+.location__map-container { border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow-sm); }
+
+@media (max-width: 768px) {
+  .location__content-wrapper { grid-template-columns: 1fr; gap: 32px; }
+}
 .location__cities-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -1189,230 +1232,211 @@ address { font-style: normal; }
 }
 
 /* ==================== PORTFOLIO CARROSSEL ==================== */
+
+/* ---------- Carrossel principal de projetos ---------- */
 .portfolio__carousel-container {
   position: relative;
   max-width: 1200px;
   margin: 0 auto 40px;
-  overflow: hidden;
+  /* overflow visível para que os botões laterais apareçam */
+  overflow: visible;
 }
 
+/* Track deslizante — sem scroll nativo, movido via JS/transform */
 .portfolio__carousel {
   display: flex;
-  overflow-x: auto;
-  scroll-behavior: smooth;
-  scroll-snap-type: x mandatory;
   gap: 24px;
-  padding: 20px 0;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none; /* Firefox */
+  /* sem overflow-x: auto — o movimento é 100% por transform */
+  overflow: hidden;
+  padding: 8px 0 20px;
+  border-radius: var(--radius-md);
 }
 
-.portfolio__carousel::-webkit-scrollbar {
-  display: none; /* Chrome, Safari, Edge */
-}
-
+/* Cada item ocupa 1/3 da largura no desktop */
 .portfolio__carousel-item {
   flex: 0 0 calc(33.333% - 16px);
-  scroll-snap-align: start;
-  transition: transform 0.3s ease;
+  transition: opacity .4s ease, transform .4s ease;
+}
+/* Destaque sutil no slide ativo */
+.portfolio__carousel-item.is-active {
+  transform: translateY(-4px);
 }
 
 @media (max-width: 1024px) {
-  .portfolio__carousel-item {
-    flex: 0 0 calc(50% - 12px);
-  }
+  .portfolio__carousel-item { flex: 0 0 calc(50% - 12px); }
 }
-
 @media (max-width: 768px) {
-  .portfolio__carousel-item {
-    flex: 0 0 100%;
-  }
+  .portfolio__carousel-item { flex: 0 0 calc(100% - 0px); }
 }
 
-/* Botões de navegação do carrossel principal */
+/* Botões de navegação laterais do carrossel principal */
 .carousel__main-prev,
 .carousel__main-next {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
   background: var(--primary);
   color: var(--secondary);
   border: none;
   border-radius: 50%;
-  font-size: 24px;
+  font-size: 20px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.3s ease;
+  transition: background .25s ease, color .25s ease, transform .25s ease, box-shadow .25s ease;
   z-index: 10;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-md);
 }
-
 .carousel__main-prev:hover,
 .carousel__main-next:hover {
   background: var(--secondary);
   color: var(--primary);
   transform: translateY(-50%) scale(1.1);
+  box-shadow: var(--shadow-lg);
 }
-
-.carousel__main-prev {
-  left: -22px;
-}
-
-.carousel__main-next {
-  right: -22px;
-}
+.carousel__main-prev { left: -24px; }
+.carousel__main-next { right: -24px; }
 
 @media (max-width: 768px) {
-  .carousel__main-prev {
-    left: 10px;
-  }
-  .carousel__main-next {
-    right: 10px;
-  }
+  .carousel__main-prev { left: 8px; }
+  .carousel__main-next { right: 8px; }
 }
 
-/* Carrossel interno de imagens */
+/* ---------- Carrossel interno de fotos por projeto ---------- */
 .portfolio__carousel-images {
-  position: relative;
-}
-
-.portfolio__main-image {
   position: relative;
   overflow: hidden;
   border-radius: var(--radius-md) var(--radius-md) 0 0;
 }
 
-.portfolio__main-image img {
+/* Track interno — movido via transform, não scroll */
+.portfolio__inner-track {
+  display: flex;
+  transition: transform .55s cubic-bezier(.4,0,.2,1);
+}
+
+.portfolio__inner-track img {
+  flex: 0 0 100%;
   width: 100%;
   height: 280px;
   object-fit: cover;
-  transition: transform 0.5s ease;
+  display: block;
 }
-
 @media (max-width: 768px) {
-  .portfolio__main-image img {
-    height: 240px;
-  }
+  .portfolio__inner-track img { height: 240px; }
 }
 
-.portfolio__card:hover .portfolio__main-image img {
-  transform: scale(1.05);
-}
-
-/* Botões de navegação do carrossel interno */
+/* Botões prev/next internos — visíveis ao hover */
 .carousel__nav-btn {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background: rgba(0, 0, 0, 0.6);
-  color: white;
+  background: rgba(0,0,0,.55);
+  color: #fff;
   border: none;
   width: 36px;
   height: 36px;
   border-radius: 50%;
   cursor: pointer;
-  font-size: 18px;
+  font-size: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.3s ease;
+  transition: background .25s, opacity .25s;
   opacity: 0;
   z-index: 5;
 }
+.portfolio__carousel-images:hover .carousel__nav-btn { opacity: 1; }
+.carousel__nav-btn:hover { background: var(--secondary); color: var(--primary); }
+.carousel__prev { left: 10px; }
+.carousel__next { right: 10px; }
 
-.portfolio__main-image:hover .carousel__nav-btn {
-  opacity: 1;
+/* Always show nav btns on touch devices */
+@media (hover: none) {
+  .carousel__nav-btn { opacity: 0.75; }
 }
 
-.carousel__nav-btn:hover {
+/* Indicador de foto (pontos internos) */
+.portfolio__inner-dots {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  z-index: 4;
+}
+.portfolio__inner-dots .dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.5);
+  border: 1px solid rgba(255,255,255,.3);
+  cursor: pointer;
+  transition: background .3s, width .3s;
+}
+.portfolio__inner-dots .dot.active {
+  background: var(--secondary);
+  width: 20px;
+  border-radius: 10px;
+}
+
+/* Tag do projeto */
+.portfolio__tag {
+  position: absolute;
+  top: 14px; left: 14px;
   background: var(--secondary);
   color: var(--primary);
+  font-family: 'Poppins', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 100px;
+  z-index: 3;
 }
 
-.carousel__prev {
-  left: 12px;
-}
-
-.carousel__next {
-  right: 12px;
-}
-
-/* Miniaturas */
-.carousel__thumbnails {
-  display: flex;
-  gap: 8px;
-  padding: 12px;
-  background: var(--white);
-  border-top: 1px solid var(--border);
-  overflow-x: auto;
-  scrollbar-width: thin;
-}
-
-.carousel__thumbnails::-webkit-scrollbar {
-  height: 4px;
-}
-
-.carousel__thumbnails::-webkit-scrollbar-track {
+/* Barra de progresso do autoplay */
+.portfolio__progress-bar {
+  height: 3px;
   background: var(--border);
-  border-radius: 10px;
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
+  overflow: hidden;
+}
+.portfolio__progress-bar-fill {
+  height: 100%;
+  background: var(--secondary);
+  width: 0%;
+  transition: width linear;
+  border-radius: 100px;
 }
 
-.carousel__thumbnails::-webkit-scrollbar-thumb {
-  background: var(--primary);
-  border-radius: 10px;
-}
-
-.carousel__thumbnails .thumb {
-  width: 60px;
-  height: 60px;
-  object-fit: cover;
-  border-radius: 8px;
-  cursor: pointer;
-  opacity: 0.6;
-  transition: all 0.3s ease;
-  border: 2px solid transparent;
-  flex-shrink: 0;
-}
-
-.carousel__thumbnails .thumb:hover {
-  opacity: 0.9;
-  transform: scale(1.05);
-}
-
-.carousel__thumbnails .thumb.active {
-  opacity: 1;
-  border-color: var(--secondary);
-  transform: scale(1.02);
-}
-
-/* Indicadores do carrossel principal */
+/* ---------- Indicadores do carrossel principal ---------- */
 .carousel__indicators {
   display: flex;
   justify-content: center;
   gap: 10px;
-  margin-top: 20px;
+  margin-top: 24px;
 }
-
 .indicator {
-  width: 10px;
-  height: 10px;
+  width: 10px; height: 10px;
   border-radius: 50%;
   background: var(--border);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all .3s ease;
+  border: none;
 }
-
 .indicator.active {
   background: var(--secondary);
   width: 28px;
   border-radius: 10px;
 }
+.indicator:hover { background: var(--primary); transform: scale(1.2); }
 
-.indicator:hover {
-  background: var(--primary);
-  transform: scale(1.2);
+/* ---------- Autoplay pausa ao hover ---------- */
+.portfolio__carousel-container:hover .portfolio__progress-bar-fill {
+  /* JS irá pausar — o CSS não remove a transição pois o JS a controla */
 }
