@@ -237,160 +237,177 @@
 
 })();
 
-// ==================== PORTFOLIO CARROSSEL ====================
-let currentSlide = 0;
-const carousel = document.getElementById('portfolioCarousel');
-const indicators = document.querySelectorAll('.indicator');
-const slides = document.querySelectorAll('.portfolio__carousel-item');
+/* ================================================================
+   PORTFOLIO CARROSSEL — versão com transform + autoplay
+   ================================================================ */
+(function () {
 
-// Configuração dos arrays de imagens para cada projeto
-const projectImages = {
-  1: ['portfolio1.png', 'portfolio11.png', 'portfolio111.png'],
-  2: ['portfolio2.png', 'portfolio22.png', 'portfolio222.png'],
-  3: ['portfolio3.png', 'portfolio33.png', 'portfolio333.png'],
-  4: ['portfolio4.png', 'portfolio44.png', 'portfolio444.png'],
-  5: ['portfolio5.png', 'portfolio55.png', 'portfolio555.png']
-};
+  /* ---------- Carrossel PRINCIPAL (projetos) ---------- */
+  const container    = document.getElementById('portfolioContainer');
+  const carousel     = document.getElementById('portfolioCarousel');
+  const items        = carousel ? [...carousel.querySelectorAll('.portfolio__carousel-item')] : [];
+  const indicators   = [...document.querySelectorAll('#carouselIndicators .indicator')];
+  const btnPrev      = document.getElementById('mainPrev');
+  const btnNext      = document.getElementById('mainNext');
 
-// Estado atual de cada projeto
-let currentImageIndex = {
-  1: 0,
-  2: 0,
-  3: 0,
-  4: 0,
-  5: 0
-};
+  if (!carousel || !items.length) return;
 
-// Função para mudar a imagem de um projeto específico
-function changeImage(projectId, direction) {
-  const images = projectImages[projectId];
-  if (!images) return;
-  
-  let newIndex = currentImageIndex[projectId] + direction;
-  if (newIndex < 0) newIndex = images.length - 1;
-  if (newIndex >= images.length) newIndex = 0;
-  
-  currentImageIndex[projectId] = newIndex;
-  
-  // Atualiza a imagem principal
-  const mainImg = document.getElementById(`mainImg${projectId}`);
-  if (mainImg) {
-    mainImg.src = `imagens/${images[newIndex]}`;
+  let mainIndex     = 0;
+  let mainPaused    = false;
+  let mainTimer     = null;
+  const MAIN_DELAY  = 5000; // ms entre projetos
+
+  /* Quantos slides visíveis de uma vez */
+  function visibleCount () {
+    if (window.innerWidth <= 768)  return 1;
+    if (window.innerWidth <= 1024) return 2;
+    return 3;
   }
-  
-  // Atualiza as miniaturas ativas
-  const thumbnails = document.getElementById(`thumbnails${projectId}`);
-  if (thumbnails) {
-    const thumbs = thumbnails.querySelectorAll('.thumb');
-    thumbs.forEach((thumb, idx) => {
-      if (idx === newIndex) {
-        thumb.classList.add('active');
-      } else {
-        thumb.classList.remove('active');
-      }
+
+  function maxIndex () {
+    return Math.max(0, items.length - visibleCount());
+  }
+
+  function goToMain (idx) {
+    mainIndex = Math.max(0, Math.min(idx, maxIndex()));
+
+    /* Calcula a largura de um item + gap */
+    const gap      = 24;
+    const itemW    = items[0].getBoundingClientRect().width || items[0].offsetWidth;
+    const offset   = mainIndex * (itemW + gap);
+
+    carousel.style.transform = `translateX(-${offset}px)`;
+    carousel.style.transition = 'transform .5s cubic-bezier(.4,0,.2,1)';
+
+    /* Destaque ativo */
+    items.forEach((it, i) => it.classList.toggle('is-active', i === mainIndex));
+
+    /* Indicadores */
+    indicators.forEach((dot, i) => dot.classList.toggle('active', i === mainIndex));
+  }
+
+  function nextMain () {
+    goToMain(mainIndex >= maxIndex() ? 0 : mainIndex + 1);
+  }
+  function prevMain () {
+    goToMain(mainIndex <= 0 ? maxIndex() : mainIndex - 1);
+  }
+
+  /* Autoplay do carrossel principal */
+  function startMainAutoplay () {
+    clearInterval(mainTimer);
+    mainTimer = setInterval(() => { if (!mainPaused) nextMain(); }, MAIN_DELAY);
+  }
+
+  if (btnNext) btnNext.addEventListener('click', () => { nextMain(); startMainAutoplay(); });
+  if (btnPrev) btnPrev.addEventListener('click', () => { prevMain(); startMainAutoplay(); });
+
+  indicators.forEach((dot, i) => {
+    dot.addEventListener('click', () => { goToMain(i); startMainAutoplay(); });
+  });
+
+  /* Pausa ao hover */
+  if (container) {
+    container.addEventListener('mouseenter', () => { mainPaused = true; });
+    container.addEventListener('mouseleave', () => { mainPaused = false; });
+    /* Touch: pausa ao tocar, retoma ao soltar */
+    container.addEventListener('touchstart', () => { mainPaused = true; }, { passive: true });
+    container.addEventListener('touchend',   () => {
+      setTimeout(() => { mainPaused = false; }, 2000);
     });
   }
-}
 
-// Função para definir a imagem atual diretamente
-function setCurrentImage(projectId, index) {
-  currentImageIndex[projectId] = index;
-  const images = projectImages[projectId];
-  if (!images) return;
-  
-  const mainImg = document.getElementById(`mainImg${projectId}`);
-  if (mainImg) {
-    mainImg.src = `imagens/${images[index]}`;
-  }
-  
-  const thumbnails = document.getElementById(`thumbnails${projectId}`);
-  if (thumbnails) {
-    const thumbs = thumbnails.querySelectorAll('.thumb');
-    thumbs.forEach((thumb, idx) => {
-      if (idx === index) {
-        thumb.classList.add('active');
-      } else {
-        thumb.classList.remove('active');
-      }
-    });
-  }
-}
-
-// Função para rolar o carrossel principal
-function scrollCarousel(direction) {
-  if (!carousel) return;
-  
-  const slideWidth = slides[0]?.offsetWidth || 0;
-  const gap = 24;
-  const scrollAmount = (slideWidth + gap) * direction;
-  
-  carousel.scrollBy({
-    left: scrollAmount,
-    behavior: 'smooth'
-  });
-  
-  // Atualiza os indicadores após o scroll
-  setTimeout(updateIndicators, 300);
-}
-
-// Função para ir para um slide específico
-function goToSlide(index) {
-  if (!carousel || !slides[index]) return;
-  
-  const slideWidth = slides[0].offsetWidth;
-  const gap = 24;
-  const scrollPosition = (slideWidth + gap) * index;
-  
-  carousel.scrollTo({
-    left: scrollPosition,
-    behavior: 'smooth'
-  });
-  
-  currentSlide = index;
-  updateIndicators();
-}
-
-// Função para atualizar os indicadores baseado no scroll
-function updateIndicators() {
-  if (!carousel || !slides.length) return;
-  
-  const scrollPosition = carousel.scrollLeft;
-  const slideWidth = slides[0].offsetWidth;
-  const gap = 24;
-  const slideTotalWidth = slideWidth + gap;
-  
-  let activeIndex = Math.round(scrollPosition / slideTotalWidth);
-  activeIndex = Math.min(activeIndex, slides.length - 1);
-  activeIndex = Math.max(activeIndex, 0);
-  
-  indicators.forEach((indicator, idx) => {
-    if (idx === activeIndex) {
-      indicator.classList.add('active');
-    } else {
-      indicator.classList.remove('active');
-    }
-  });
-  
-  currentSlide = activeIndex;
-}
-
-// Event listener para atualizar indicadores ao rolar
-if (carousel) {
-  carousel.addEventListener('scroll', updateIndicators);
+  /* Recalcula offset ao redimensionar */
   window.addEventListener('resize', () => {
-    setTimeout(updateIndicators, 100);
+    carousel.style.transition = 'none';
+    goToMain(Math.min(mainIndex, maxIndex()));
   });
-}
 
-// Inicializar o carrossel
-document.addEventListener('DOMContentLoaded', function() {
-  updateIndicators();
-  
-  // Pré-carregar imagens para melhor experiência
-  Object.values(projectImages).forEach(images => {
-    images.forEach(img => {
-      const preloadImg = new Image();
-      preloadImg.src = `imagens/${img}`;
+  /* Inicializa */
+  carousel.style.flexWrap = 'nowrap';
+  goToMain(0);
+  startMainAutoplay();
+
+  /* ---------- Carrossel INTERNO de fotos por projeto ---------- */
+  /*
+   * Para cada .portfolio__carousel-images:
+   *   - Lê quantas imgs há no .portfolio__inner-track
+   *   - Cria prev/next + dots (já estão no HTML, só inicializa estado)
+   *   - Autoplay individual (3 s) que pausa ao hover do card
+   */
+  const INNER_DELAY = 3200; // ms entre fotos
+
+  document.querySelectorAll('.portfolio__carousel-images').forEach(wrapper => {
+    const track  = wrapper.querySelector('.portfolio__inner-track');
+    const imgs   = track ? [...track.querySelectorAll('img')] : [];
+    if (!imgs.length) return;
+
+    const dots     = [...wrapper.querySelectorAll('.portfolio__inner-dots .dot')];
+    const prevBtn  = wrapper.querySelector('.carousel__prev');
+    const nextBtn  = wrapper.querySelector('.carousel__next');
+    const fill     = wrapper.querySelector('.portfolio__progress-bar-fill');
+
+    let idx    = 0;
+    let paused = false;
+    let timer  = null;
+
+    function goTo (i) {
+      idx = (i + imgs.length) % imgs.length;
+      track.style.transform  = `translateX(-${idx * 100}%)`;
+      track.style.transition = 'transform .55s cubic-bezier(.4,0,.2,1)';
+      dots.forEach((d, j) => d.classList.toggle('active', j === idx));
+    }
+
+    function next () { goTo(idx + 1); }
+    function prev () { goTo(idx - 1); }
+
+    /* Barra de progresso */
+    function resetBar () {
+      if (!fill) return;
+      fill.style.transition = 'none';
+      fill.style.width = '0%';
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          fill.style.transition = `width ${INNER_DELAY}ms linear`;
+          fill.style.width = '100%';
+        });
+      });
+    }
+
+    function startInner () {
+      clearInterval(timer);
+      resetBar();
+      timer = setInterval(() => {
+        if (!paused) { next(); resetBar(); }
+      }, INNER_DELAY);
+    }
+
+    if (prevBtn) prevBtn.addEventListener('click', e => { e.stopPropagation(); prev(); startInner(); });
+    if (nextBtn) nextBtn.addEventListener('click', e => { e.stopPropagation(); next(); startInner(); });
+    dots.forEach((d, i) => d.addEventListener('click', e => { e.stopPropagation(); goTo(i); startInner(); }));
+
+    /* Pausa ao hover do card pai */
+    const card = wrapper.closest('.portfolio__card');
+    if (card) {
+      card.addEventListener('mouseenter', () => { paused = true;  if (fill) fill.style.animationPlayState = 'paused'; });
+      card.addEventListener('mouseleave', () => { paused = false; startInner(); });
+    }
+
+    /* Touch swipe simples */
+    let touchStartX = 0;
+    wrapper.addEventListener('touchstart', e => {
+      touchStartX = e.touches[0].clientX;
+      paused = true;
+    }, { passive: true });
+    wrapper.addEventListener('touchend', e => {
+      const dx = e.changedTouches[0].clientX - touchStartX;
+      if (Math.abs(dx) > 40) { dx < 0 ? next() : prev(); }
+      startInner();
+      setTimeout(() => { paused = false; }, 1500);
     });
+
+    goTo(0);
+    startInner();
   });
-});
+
+})();
