@@ -238,8 +238,10 @@
 })();
 
 /* ================================================================
-   PORTFOLIO CARROSSEL — versão com transform + autoplay
+   PORTFOLIO CARROSSEL ANINHADO — versão melhorada
+   Carrossel principal (projetos) + carrossel interno (fotos por projeto)
    ================================================================ */
+
 (function () {
 
   /* ---------- Carrossel PRINCIPAL (projetos) ---------- */
@@ -255,7 +257,7 @@
   let mainIndex     = 0;
   let mainPaused    = false;
   let mainTimer     = null;
-  const MAIN_DELAY  = 5000; // ms entre projetos
+  const MAIN_DELAY  = 6000; // ms entre projetos
 
   /* Quantos slides visíveis de uma vez */
   function visibleCount () {
@@ -271,7 +273,6 @@
   function goToMain (idx) {
     mainIndex = Math.max(0, Math.min(idx, maxIndex()));
 
-    /* Calcula a largura de um item + gap */
     const gap      = 24;
     const itemW    = items[0].getBoundingClientRect().width || items[0].offsetWidth;
     const offset   = mainIndex * (itemW + gap);
@@ -279,65 +280,66 @@
     carousel.style.transform = `translateX(-${offset}px)`;
     carousel.style.transition = 'transform .5s cubic-bezier(.4,0,.2,1)';
 
-    /* Destaque ativo */
-    items.forEach((it, i) => it.classList.toggle('is-active', i === mainIndex));
-
-    /* Indicadores */
+    /* Atualiza indicadores */
     indicators.forEach((dot, i) => dot.classList.toggle('active', i === mainIndex));
   }
 
   function nextMain () {
     goToMain(mainIndex >= maxIndex() ? 0 : mainIndex + 1);
+    resetMainAutoplay();
   }
+  
   function prevMain () {
     goToMain(mainIndex <= 0 ? maxIndex() : mainIndex - 1);
+    resetMainAutoplay();
   }
 
-  /* Autoplay do carrossel principal */
+  function resetMainAutoplay () {
+    clearInterval(mainTimer);
+    if (!mainPaused) {
+      mainTimer = setInterval(() => { if (!mainPaused) nextMain(); }, MAIN_DELAY);
+    }
+  }
+
   function startMainAutoplay () {
     clearInterval(mainTimer);
     mainTimer = setInterval(() => { if (!mainPaused) nextMain(); }, MAIN_DELAY);
   }
 
-  if (btnNext) btnNext.addEventListener('click', () => { nextMain(); startMainAutoplay(); });
-  if (btnPrev) btnPrev.addEventListener('click', () => { prevMain(); startMainAutoplay(); });
+  if (btnNext) btnNext.addEventListener('click', nextMain);
+  if (btnPrev) btnPrev.addEventListener('click', prevMain);
 
   indicators.forEach((dot, i) => {
-    dot.addEventListener('click', () => { goToMain(i); startMainAutoplay(); });
+    dot.addEventListener('click', () => { goToMain(i); resetMainAutoplay(); });
   });
 
   /* Pausa ao hover */
   if (container) {
     container.addEventListener('mouseenter', () => { mainPaused = true; });
-    container.addEventListener('mouseleave', () => { mainPaused = false; });
-    /* Touch: pausa ao tocar, retoma ao soltar */
+    container.addEventListener('mouseleave', () => { mainPaused = false; resetMainAutoplay(); });
     container.addEventListener('touchstart', () => { mainPaused = true; }, { passive: true });
-    container.addEventListener('touchend',   () => {
-      setTimeout(() => { mainPaused = false; }, 2000);
+    container.addEventListener('touchend', () => {
+      setTimeout(() => { mainPaused = false; resetMainAutoplay(); }, 2000);
     });
   }
 
-  /* Recalcula offset ao redimensionar */
   window.addEventListener('resize', () => {
     carousel.style.transition = 'none';
     goToMain(Math.min(mainIndex, maxIndex()));
   });
 
-  /* Inicializa */
   carousel.style.flexWrap = 'nowrap';
   goToMain(0);
   startMainAutoplay();
 
-  /* ---------- Carrossel INTERNO de fotos por projeto ---------- */
-  /*
-   * Para cada .portfolio__carousel-images:
-   *   - Lê quantas imgs há no .portfolio__inner-track
-   *   - Cria prev/next + dots (já estão no HTML, só inicializa estado)
-   *   - Autoplay individual (3 s) que pausa ao hover do card
-   */
-  const INNER_DELAY = 3200; // ms entre fotos
+  /* ================================================================
+     Carrossel INTERNO de fotos por projeto (melhorado)
+     Cada projeto tem seu próprio carrossel independente
+  ================================================================ */
+  
+  const INNER_DELAY = 4000; // ms entre fotos internas
 
-  document.querySelectorAll('.portfolio__carousel-images').forEach(wrapper => {
+  function initInnerCarousel(wrapper) {
     const track  = wrapper.querySelector('.portfolio__inner-track');
     const imgs   = track ? [...track.querySelectorAll('img')] : [];
     if (!imgs.length) return;
@@ -346,68 +348,167 @@
     const prevBtn  = wrapper.querySelector('.carousel__prev');
     const nextBtn  = wrapper.querySelector('.carousel__next');
     const fill     = wrapper.querySelector('.portfolio__progress-bar-fill');
-
-    let idx    = 0;
+    
+    let currentIdx = 0;
     let paused = false;
-    let timer  = null;
+    let timer = null;
+    let autoPlayEnabled = true;
 
-    function goTo (i) {
-      idx = (i + imgs.length) % imgs.length;
-      track.style.transform  = `translateX(-${idx * 100}%)`;
+    function goTo(index) {
+      currentIdx = (index + imgs.length) % imgs.length;
+      track.style.transform = `translateX(-${currentIdx * 100}%)`;
       track.style.transition = 'transform .55s cubic-bezier(.4,0,.2,1)';
-      dots.forEach((d, j) => d.classList.toggle('active', j === idx));
+      
+      /* Atualiza dots */
+      dots.forEach((dot, i) => {
+        dot.classList.toggle('active', i === currentIdx);
+      });
+      
+      /* Reinicia a barra de progresso se autoplay estiver ativo */
+      if (autoPlayEnabled && !paused) {
+        resetProgressBar();
+      }
     }
 
-    function next () { goTo(idx + 1); }
-    function prev () { goTo(idx - 1); }
+    function next() { 
+      goTo(currentIdx + 1); 
+      if (autoPlayEnabled && !paused) resetProgressBar();
+    }
+    
+    function prev() { 
+      goTo(currentIdx - 1);
+      if (autoPlayEnabled && !paused) resetProgressBar();
+    }
 
-    /* Barra de progresso */
-    function resetBar () {
+    function resetProgressBar() {
       if (!fill) return;
       fill.style.transition = 'none';
       fill.style.width = '0%';
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          fill.style.transition = `width ${INNER_DELAY}ms linear`;
-          fill.style.width = '100%';
-        });
-      });
+      // Força reflow
+      void fill.offsetWidth;
+      fill.style.transition = `width ${INNER_DELAY}ms linear`;
+      fill.style.width = '100%';
     }
 
-    function startInner () {
-      clearInterval(timer);
-      resetBar();
+    function startAutoplay() {
+      if (timer) clearInterval(timer);
+      if (!autoPlayEnabled || paused) return;
+      
+      resetProgressBar();
       timer = setInterval(() => {
-        if (!paused) { next(); resetBar(); }
+        if (!paused && autoPlayEnabled) {
+          next();
+        }
       }, INNER_DELAY);
     }
 
-    if (prevBtn) prevBtn.addEventListener('click', e => { e.stopPropagation(); prev(); startInner(); });
-    if (nextBtn) nextBtn.addEventListener('click', e => { e.stopPropagation(); next(); startInner(); });
-    dots.forEach((d, i) => d.addEventListener('click', e => { e.stopPropagation(); goTo(i); startInner(); }));
+    function stopAutoplay() {
+      if (timer) {
+        clearInterval(timer);
+        timer = null;
+      }
+    }
+
+    function enableAutoplay() {
+      autoPlayEnabled = true;
+      startAutoplay();
+    }
+
+    function disableAutoplay() {
+      autoPlayEnabled = false;
+      stopAutoplay();
+      if (fill) {
+        fill.style.transition = 'none';
+        fill.style.width = '0%';
+      }
+    }
+
+    /* Eventos dos botões */
+    if (prevBtn) {
+      prevBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        prev();
+        stopAutoplay();
+        startAutoplay();
+      });
+    }
+    
+    if (nextBtn) {
+      nextBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        next();
+        stopAutoplay();
+        startAutoplay();
+      });
+    }
+    
+    /* Eventos dos dots */
+    dots.forEach((dot, i) => {
+      dot.addEventListener('click', (e) => {
+        e.stopPropagation();
+        goTo(i);
+        stopAutoplay();
+        startAutoplay();
+      });
+    });
 
     /* Pausa ao hover do card pai */
     const card = wrapper.closest('.portfolio__card');
     if (card) {
-      card.addEventListener('mouseenter', () => { paused = true;  if (fill) fill.style.animationPlayState = 'paused'; });
-      card.addEventListener('mouseleave', () => { paused = false; startInner(); });
+      card.addEventListener('mouseenter', () => {
+        paused = true;
+        stopAutoplay();
+        if (fill) fill.style.animationPlayState = 'paused';
+      });
+      
+      card.addEventListener('mouseleave', () => {
+        paused = false;
+        startAutoplay();
+      });
     }
 
-    /* Touch swipe simples */
+    /* Touch swipe */
     let touchStartX = 0;
-    wrapper.addEventListener('touchstart', e => {
+    let touchStartY = 0;
+    
+    wrapper.addEventListener('touchstart', (e) => {
       touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
       paused = true;
+      stopAutoplay();
     }, { passive: true });
-    wrapper.addEventListener('touchend', e => {
-      const dx = e.changedTouches[0].clientX - touchStartX;
-      if (Math.abs(dx) > 40) { dx < 0 ? next() : prev(); }
-      startInner();
-      setTimeout(() => { paused = false; }, 1500);
+    
+    wrapper.addEventListener('touchend', (e) => {
+      const deltaX = e.changedTouches[0].clientX - touchStartX;
+      const deltaY = e.changedTouches[0].clientY - touchStartY;
+      
+      // Só faz swipe se for mais horizontal que vertical
+      if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 40) {
+        if (deltaX < 0) {
+          next();
+        } else {
+          prev();
+        }
+      }
+      
+      setTimeout(() => {
+        paused = false;
+        startAutoplay();
+      }, 1500);
     });
 
+    /* Inicializa */
     goTo(0);
-    startInner();
+    
+    // Se o wrapper estiver visível, inicia autoplay
+    if (autoPlayEnabled) {
+      startAutoplay();
+    }
+  }
+
+  /* Inicializa todos os carrosséis internos */
+  document.querySelectorAll('.portfolio__carousel-images').forEach(wrapper => {
+    initInnerCarousel(wrapper);
   });
 
 })();
