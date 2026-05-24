@@ -533,7 +533,8 @@ address { font-style: normal; }
   }
 
   /* Esconde seta de scroll no mobile para não poluir */
-  .hero__scroll { display: none; }
+  .hero__scroll { display: none;
+  }
 }
 
 /* Ajuste intermediário: tablet pequeno */
@@ -740,6 +741,7 @@ address { font-style: normal; }
   text-transform: uppercase;
   padding: 4px 12px;
   border-radius: 100px;
+  z-index: 15;
 }
 .portfolio__info { padding: 20px 22px; }
 .portfolio__info h3 { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
@@ -754,6 +756,242 @@ address { font-style: normal; }
   padding: 3px 10px;
 }
 .portfolio__cta { text-align: center; }
+
+/* ==================== PORTFOLIO CARROSSEL ==================== */
+
+/* ---------- Carrossel principal de projetos ---------- */
+.portfolio__carousel-container {
+  position: relative;
+  max-width: 1200px;
+  margin: 0 auto 40px;
+  overflow: visible;
+}
+
+/* Track deslizante — sem scroll nativo, movido via JS/transform */
+.portfolio__carousel {
+  display: flex;
+  gap: 24px;
+  overflow: hidden;
+  padding: 8px 0 20px;
+  border-radius: var(--radius-md);
+}
+
+/* Cada item ocupa 1/3 da largura no desktop */
+.portfolio__carousel-item {
+  flex: 0 0 calc(33.333% - 16px);
+  transition: opacity .4s ease, transform .4s ease;
+}
+
+@media (max-width: 1024px) {
+  .portfolio__carousel-item { flex: 0 0 calc(50% - 12px); }
+}
+@media (max-width: 768px) {
+  .portfolio__carousel-item { flex: 0 0 calc(100% - 0px); }
+}
+
+/* Botões de navegação laterais do carrossel principal */
+.carousel__main-prev,
+.carousel__main-next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 48px;
+  background: var(--primary);
+  color: var(--secondary);
+  border: none;
+  border-radius: 50%;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .25s ease, color .25s ease, transform .25s ease, box-shadow .25s ease;
+  z-index: 10;
+  box-shadow: var(--shadow-md);
+}
+.carousel__main-prev:hover,
+.carousel__main-next:hover {
+  background: var(--secondary);
+  color: var(--primary);
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: var(--shadow-lg);
+}
+.carousel__main-prev { left: -24px; }
+.carousel__main-next { right: -24px; }
+
+@media (max-width: 768px) {
+  .carousel__main-prev { left: 8px; }
+  .carousel__main-next { right: 8px; }
+}
+
+/* ---------- Carrossel interno de fotos por projeto (MELHORADO) ---------- */
+.portfolio__carousel-images {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+}
+
+/* Track interno — movido via transform, não scroll */
+.portfolio__inner-track {
+  display: flex;
+  transition: transform .55s cubic-bezier(.4,0,.2,1);
+}
+
+.portfolio__inner-track img {
+  flex: 0 0 100%;
+  width: 100%;
+  height: 280px;
+  object-fit: cover;
+  display: block;
+}
+@media (max-width: 768px) {
+  .portfolio__inner-track img { height: 240px; }
+}
+
+/* Botões prev/next internos - melhorados */
+.carousel__nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  z-index: 10;
+  opacity: 0.7;
+}
+
+/* Desktop: botões aparecem no hover */
+@media (min-width: 769px) {
+  .carousel__nav-btn {
+    opacity: 0;
+  }
+  .portfolio__carousel-images:hover .carousel__nav-btn {
+    opacity: 0.9;
+  }
+}
+
+/* Mobile: botões sempre visíveis */
+@media (max-width: 768px) {
+  .carousel__nav-btn {
+    opacity: 0.8;
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+  }
+}
+
+.carousel__nav-btn:hover {
+  background: var(--secondary);
+  color: var(--primary);
+  transform: translateY(-50%) scale(1.1);
+  opacity: 1;
+}
+
+.carousel__prev {
+  left: 12px;
+}
+
+.carousel__next {
+  right: 12px;
+}
+
+/* Indicadores internos - melhorados */
+.portfolio__inner-dots {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 10;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 6px 12px;
+  border-radius: 30px;
+  backdrop-filter: blur(4px);
+}
+
+.portfolio__inner-dots .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.portfolio__inner-dots .dot.active {
+  background: var(--secondary);
+  width: 24px;
+  border-radius: 10px;
+}
+
+/* Tag do projeto */
+.portfolio__tag {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  background: var(--secondary);
+  color: var(--primary);
+  font-family: 'Poppins', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 100px;
+  z-index: 15;
+}
+
+/* Barra de progresso do autoplay - melhorada */
+.portfolio__progress-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 0;
+  z-index: 10;
+}
+
+.portfolio__progress-bar-fill {
+  height: 100%;
+  background: var(--secondary);
+  width: 0%;
+  transition: width linear;
+}
+
+/* ---------- Indicadores do carrossel principal ---------- */
+.carousel__indicators {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 24px;
+}
+.indicator {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--border);
+  cursor: pointer;
+  transition: all .3s ease;
+  border: none;
+}
+.indicator.active {
+  background: var(--secondary);
+  width: 28px;
+  border-radius: 10px;
+}
+.indicator:hover { background: var(--primary); transform: scale(1.2); }
 
 /* ==================== ABOUT ==================== */
 .about__inner {
@@ -1207,8 +1445,6 @@ address { font-style: normal; }
   .process__connector { display: none; }
   .process__step   { max-width: 100%; min-width: unset; }
 
-  /* hero stats/actions handled in the hero mobile block above */
-
   .problems__highlight { flex-direction: column; text-align: center; }
 
   .form__row { grid-template-columns: 1fr; }
@@ -1229,214 +1465,4 @@ address { font-style: normal; }
   .qualification__col { padding: 24px 20px; }
   .contact__form-wrap { padding: 24px 16px; }
   .whatsapp-float { bottom: 18px; right: 18px; width: 52px; height: 52px; font-size: 24px; }
-}
-
-/* ==================== PORTFOLIO CARROSSEL ==================== */
-
-/* ---------- Carrossel principal de projetos ---------- */
-.portfolio__carousel-container {
-  position: relative;
-  max-width: 1200px;
-  margin: 0 auto 40px;
-  /* overflow visível para que os botões laterais apareçam */
-  overflow: visible;
-}
-
-/* Track deslizante — sem scroll nativo, movido via JS/transform */
-.portfolio__carousel {
-  display: flex;
-  gap: 24px;
-  /* sem overflow-x: auto — o movimento é 100% por transform */
-  overflow: hidden;
-  padding: 8px 0 20px;
-  border-radius: var(--radius-md);
-}
-
-/* Cada item ocupa 1/3 da largura no desktop */
-.portfolio__carousel-item {
-  flex: 0 0 calc(33.333% - 16px);
-  transition: opacity .4s ease, transform .4s ease;
-}
-/* Destaque sutil no slide ativo */
-.portfolio__carousel-item.is-active {
-  transform: translateY(-4px);
-}
-
-@media (max-width: 1024px) {
-  .portfolio__carousel-item { flex: 0 0 calc(50% - 12px); }
-}
-@media (max-width: 768px) {
-  .portfolio__carousel-item { flex: 0 0 calc(100% - 0px); }
-}
-
-/* Botões de navegação laterais do carrossel principal */
-.carousel__main-prev,
-.carousel__main-next {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 48px;
-  height: 48px;
-  background: var(--primary);
-  color: var(--secondary);
-  border: none;
-  border-radius: 50%;
-  font-size: 20px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background .25s ease, color .25s ease, transform .25s ease, box-shadow .25s ease;
-  z-index: 10;
-  box-shadow: var(--shadow-md);
-}
-.carousel__main-prev:hover,
-.carousel__main-next:hover {
-  background: var(--secondary);
-  color: var(--primary);
-  transform: translateY(-50%) scale(1.1);
-  box-shadow: var(--shadow-lg);
-}
-.carousel__main-prev { left: -24px; }
-.carousel__main-next { right: -24px; }
-
-@media (max-width: 768px) {
-  .carousel__main-prev { left: 8px; }
-  .carousel__main-next { right: 8px; }
-}
-
-/* ---------- Carrossel interno de fotos por projeto ---------- */
-.portfolio__carousel-images {
-  position: relative;
-  overflow: hidden;
-  border-radius: var(--radius-md) var(--radius-md) 0 0;
-}
-
-/* Track interno — movido via transform, não scroll */
-.portfolio__inner-track {
-  display: flex;
-  transition: transform .55s cubic-bezier(.4,0,.2,1);
-}
-
-.portfolio__inner-track img {
-  flex: 0 0 100%;
-  width: 100%;
-  height: 280px;
-  object-fit: cover;
-  display: block;
-}
-@media (max-width: 768px) {
-  .portfolio__inner-track img { height: 240px; }
-}
-
-/* Botões prev/next internos — visíveis ao hover */
-.carousel__nav-btn {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  background: rgba(0,0,0,.55);
-  color: #fff;
-  border: none;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  cursor: pointer;
-  font-size: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background .25s, opacity .25s;
-  opacity: 0;
-  z-index: 5;
-}
-.portfolio__carousel-images:hover .carousel__nav-btn { opacity: 1; }
-.carousel__nav-btn:hover { background: var(--secondary); color: var(--primary); }
-.carousel__prev { left: 10px; }
-.carousel__next { right: 10px; }
-
-/* Always show nav btns on touch devices */
-@media (hover: none) {
-  .carousel__nav-btn { opacity: 0.75; }
-}
-
-/* Indicador de foto (pontos internos) */
-.portfolio__inner-dots {
-  position: absolute;
-  bottom: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 6px;
-  z-index: 4;
-}
-.portfolio__inner-dots .dot {
-  width: 8px; height: 8px;
-  border-radius: 50%;
-  background: rgba(255,255,255,.5);
-  border: 1px solid rgba(255,255,255,.3);
-  cursor: pointer;
-  transition: background .3s, width .3s;
-}
-.portfolio__inner-dots .dot.active {
-  background: var(--secondary);
-  width: 20px;
-  border-radius: 10px;
-}
-
-/* Tag do projeto */
-.portfolio__tag {
-  position: absolute;
-  top: 14px; left: 14px;
-  background: var(--secondary);
-  color: var(--primary);
-  font-family: 'Poppins', sans-serif;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: .06em;
-  text-transform: uppercase;
-  padding: 4px 12px;
-  border-radius: 100px;
-  z-index: 3;
-}
-
-/* Barra de progresso do autoplay */
-.portfolio__progress-bar {
-  height: 3px;
-  background: var(--border);
-  border-radius: 0 0 var(--radius-md) var(--radius-md);
-  overflow: hidden;
-}
-.portfolio__progress-bar-fill {
-  height: 100%;
-  background: var(--secondary);
-  width: 0%;
-  transition: width linear;
-  border-radius: 100px;
-}
-
-/* ---------- Indicadores do carrossel principal ---------- */
-.carousel__indicators {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-top: 24px;
-}
-.indicator {
-  width: 10px; height: 10px;
-  border-radius: 50%;
-  background: var(--border);
-  cursor: pointer;
-  transition: all .3s ease;
-  border: none;
-}
-.indicator.active {
-  background: var(--secondary);
-  width: 28px;
-  border-radius: 10px;
-}
-.indicator:hover { background: var(--primary); transform: scale(1.2); }
-
-/* ---------- Autoplay pausa ao hover ---------- */
-.portfolio__carousel-container:hover .portfolio__progress-bar-fill {
-  /* JS irá pausar — o CSS não remove a transição pois o JS a controla */
 }
