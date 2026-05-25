@@ -662,58 +662,29 @@ address { font-style: normal; }
 }
 .process__cta { text-align: center; }
 
-/* ==================== PORTFOLIO CARROSSEL ==================== */
+/* ==================== PORTFOLIO CARROSSEL PRINCIPAL ==================== */
 
-/* ---------- Carrossel principal de projetos ---------- */
 .portfolio__carousel-container {
   position: relative;
   max-width: 1200px;
   margin: 0 auto 40px;
-  overflow: visible;
+  overflow: hidden;
+  border-radius: var(--radius-md);
 }
 
-/* Track deslizante */
 .portfolio__carousel {
   display: flex;
   gap: 24px;
-  overflow: hidden;
-  padding: 8px 0 20px;
-  border-radius: var(--radius-md);
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+  transition: transform 0.5s ease-in-out;
+  will-change: transform;
 }
 
-.portfolio__carousel::-webkit-scrollbar {
-  display: none;
-}
-
-/* Cada item - CORRIGIDO: usa width fixa baseada no container pai */
 .portfolio__carousel-item {
   flex: 0 0 auto;
-  width: calc(33.333% - 16px);
-  transition: opacity .4s ease, transform .4s ease;
+  transition: opacity 0.3s ease;
 }
 
-/* Tablet: 2 itens visíveis */
-@media (max-width: 1024px) {
-  .portfolio__carousel-item {
-    width: calc(50% - 12px);
-  }
-}
-
-/* Mobile: 1 item visível */
-@media (max-width: 768px) {
-  .portfolio__carousel-item {
-    width: calc(100% - 0px);
-  }
-}
-
-/* Destaque no item ativo */
-.portfolio__carousel-item.is-active {
-  transform: translateY(-4px);
-}
-
-/* Botões de navegação laterais do carrossel principal */
+/* Botões de navegação */
 .carousel__main-prev,
 .carousel__main-next {
   position: absolute;
@@ -730,7 +701,7 @@ address { font-style: normal; }
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background .25s ease, color .25s ease, transform .25s ease, box-shadow .25s ease;
+  transition: all 0.3s ease;
   z-index: 10;
   box-shadow: var(--shadow-md);
 }
@@ -740,15 +711,44 @@ address { font-style: normal; }
   background: var(--secondary);
   color: var(--primary);
   transform: translateY(-50%) scale(1.1);
-  box-shadow: var(--shadow-lg);
 }
 
-.carousel__main-prev { left: -24px; }
-.carousel__main-next { right: -24px; }
+.carousel__main-prev {
+  left: 16px;
+}
 
-@media (max-width: 768px) {
-  .carousel__main-prev { left: 8px; }
-  .carousel__main-next { right: 8px; }
+.carousel__main-next {
+  right: 16px;
+}
+
+/* Indicadores */
+.carousel__indicators {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 32px;
+}
+
+.indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--border);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  padding: 0;
+}
+
+.indicator.active {
+  background: var(--secondary);
+  width: 28px;
+  border-radius: 10px;
+}
+
+.indicator:hover {
+  background: var(--primary);
+  transform: scale(1.2);
 }
 
 /* ---------- Carrossel interno de fotos por projeto ---------- */
@@ -758,7 +758,6 @@ address { font-style: normal; }
   border-radius: var(--radius-md) var(--radius-md) 0 0;
 }
 
-/* Track interno */
 .portfolio__inner-track {
   display: flex;
   transition: transform .55s cubic-bezier(.4,0,.2,1);
@@ -773,10 +772,12 @@ address { font-style: normal; }
 }
 
 @media (max-width: 768px) {
-  .portfolio__inner-track img { height: 240px; }
+  .portfolio__inner-track img {
+    height: 240px;
+  }
 }
 
-/* Botões prev/next internos */
+/* Botões internos */
 .carousel__nav-btn {
   position: absolute;
   top: 50%;
@@ -794,16 +795,11 @@ address { font-style: normal; }
   justify-content: center;
   transition: all 0.3s ease;
   z-index: 10;
-  opacity: 0.7;
+  opacity: 0;
 }
 
-@media (min-width: 769px) {
-  .carousel__nav-btn {
-    opacity: 0;
-  }
-  .portfolio__carousel-images:hover .carousel__nav-btn {
-    opacity: 0.9;
-  }
+.portfolio__carousel-images:hover .carousel__nav-btn {
+  opacity: 0.9;
 }
 
 @media (max-width: 768px) {
@@ -819,11 +815,15 @@ address { font-style: normal; }
   background: var(--secondary);
   color: var(--primary);
   transform: translateY(-50%) scale(1.1);
-  opacity: 1;
 }
 
-.carousel__prev { left: 12px; }
-.carousel__next { right: 12px; }
+.carousel__prev {
+  left: 12px;
+}
+
+.carousel__next {
+  right: 12px;
+}
 
 /* Indicadores internos */
 .portfolio__inner-dots {
@@ -872,7 +872,7 @@ address { font-style: normal; }
   z-index: 15;
 }
 
-/* Barra de progresso do autoplay */
+/* Barra de progresso */
 .portfolio__progress-bar {
   position: absolute;
   bottom: 0;
@@ -880,7 +880,6 @@ address { font-style: normal; }
   right: 0;
   height: 3px;
   background: rgba(255, 255, 255, 0.3);
-  border-radius: 0;
   z-index: 10;
 }
 
@@ -891,33 +890,65 @@ address { font-style: normal; }
   transition: width linear;
 }
 
-/* Indicadores do carrossel principal */
-.carousel__indicators {
+/* Informações do projeto */
+.portfolio__info {
+  padding: 20px;
+  background: var(--white);
+}
+
+.portfolio__info h3 {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.portfolio__info p {
+  font-size: 14px;
+  color: var(--text-mid);
+  margin-bottom: 8px;
   display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-top: 24px;
+  align-items: center;
+  gap: 6px;
 }
 
-.indicator {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--border);
-  cursor: pointer;
-  transition: all .3s ease;
-  border: none;
+.portfolio__type {
+  display: inline-block;
+  background: rgba(21, 60, 64, 0.1);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--primary);
 }
 
-.indicator.active {
-  background: var(--secondary);
-  width: 28px;
-  border-radius: 10px;
+.portfolio__cta {
+  text-align: center;
+  margin-top: 40px;
 }
 
-.indicator:hover {
-  background: var(--primary);
-  transform: scale(1.2);
+/* Responsividade */
+@media (max-width: 1024px) {
+  .carousel__main-prev,
+  .carousel__main-next {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 768px) {
+  .carousel__main-prev {
+    left: 8px;
+  }
+  .carousel__main-next {
+    right: 8px;
+  }
+  .carousel__indicators {
+    gap: 8px;
+  }
+  .indicator.active {
+    width: 20px;
+  }
 }
 
 /* ==================== ABOUT ==================== */
