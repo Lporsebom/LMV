@@ -1508,4 +1508,9 @@ address { font-style: normal; }
   .qualification__col { padding: 24px 20px; }
   .contact__form-wrap { padding: 24px 16px; }
   .whatsapp-float { bottom: 18px; right: 18px; width: 52px; height: 52px; font-size: 24px; }
+
+   /* Destacar primeira linha do título em amarelo */
+.hero__main-title .highlight {
+  color: var(--secondary);
+}
 }
