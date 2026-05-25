@@ -246,7 +246,7 @@
   let currentIndex = 0;
   let autoPlayInterval = null;
   let isPaused = false;
-  const AUTO_PLAY_DELAY = 5000;
+  const AUTO_PLAY_DELAY = 9500;
 
   // Função para atualizar a posição do carrossel
   function updateCarousel() {
@@ -418,7 +418,7 @@
      Carrossel INTERNO de fotos por projeto
   ================================================================ */
   
-  const INNER_DELAY = 4000;
+  const INNER_DELAY = 6500;
 
   function initInnerCarousel(wrapper) {
     const track  = wrapper.querySelector('.portfolio__inner-track');
