@@ -238,7 +238,7 @@
 })();
 
 /* ================================================================
-   PORTFOLIO CARROSSEL ANINHADO — versão melhorada
+   PORTFOLIO CARROSSEL ANINHADO — versão corrigida
    Carrossel principal (projetos) + carrossel interno (fotos por projeto)
    ================================================================ */
 
@@ -252,65 +252,100 @@
   const btnPrev      = document.getElementById('mainPrev');
   const btnNext      = document.getElementById('mainNext');
 
-  if (!carousel || !items.length) return;
+  if (!carousel || !items.length) {
+    console.warn('Carrossel não encontrado ou sem itens');
+    return;
+  }
+
+  console.log(`Carrossel inicializado com ${items.length} projetos`);
 
   let mainIndex     = 0;
   let mainPaused    = false;
   let mainTimer     = null;
   const MAIN_DELAY  = 6000; // ms entre projetos
 
-  /* Quantos slides visíveis de uma vez */
-  function visibleCount () {
+  /* Quantos slides visíveis de uma vez - corrigido */
+  function getVisibleCount () {
     if (window.innerWidth <= 768)  return 1;
     if (window.innerWidth <= 1024) return 2;
     return 3;
   }
 
-  function maxIndex () {
-    return Math.max(0, items.length - visibleCount());
+  /* Obtém a largura real de um item + gap */
+  function getItemWidth() {
+    if (!items.length) return 300;
+    const item = items[0];
+    const width = item.offsetWidth;
+    const gap = 24; // gap do CSS
+    return width + gap;
+  }
+
+  function getMaxIndex () {
+    const visible = getVisibleCount();
+    const max = Math.max(0, items.length - visible);
+    console.log(`Visible: ${visible}, Max index: ${max}, Total items: ${items.length}`);
+    return max;
   }
 
   function goToMain (idx) {
-    mainIndex = Math.max(0, Math.min(idx, maxIndex()));
-
-    const gap      = 24;
-    const itemW    = items[0].getBoundingClientRect().width || items[0].offsetWidth;
-    const offset   = mainIndex * (itemW + gap);
-
+    const maxIdx = getMaxIndex();
+    mainIndex = Math.max(0, Math.min(idx, maxIdx));
+    
+    const offset = mainIndex * getItemWidth();
+    console.log(`Go to index: ${mainIndex}, Offset: ${offset}px`);
+    
     carousel.style.transform = `translateX(-${offset}px)`;
     carousel.style.transition = 'transform .5s cubic-bezier(.4,0,.2,1)';
 
     /* Atualiza indicadores */
-    indicators.forEach((dot, i) => dot.classList.toggle('active', i === mainIndex));
+    indicators.forEach((dot, i) => {
+      dot.classList.toggle('active', i === mainIndex);
+    });
   }
 
   function nextMain () {
-    goToMain(mainIndex >= maxIndex() ? 0 : mainIndex + 1);
+    const maxIdx = getMaxIndex();
+    if (mainIndex >= maxIdx) {
+      goToMain(0);
+    } else {
+      goToMain(mainIndex + 1);
+    }
     resetMainAutoplay();
   }
   
   function prevMain () {
-    goToMain(mainIndex <= 0 ? maxIndex() : mainIndex - 1);
+    if (mainIndex <= 0) {
+      goToMain(getMaxIndex());
+    } else {
+      goToMain(mainIndex - 1);
+    }
     resetMainAutoplay();
   }
 
   function resetMainAutoplay () {
     clearInterval(mainTimer);
     if (!mainPaused) {
-      mainTimer = setInterval(() => { if (!mainPaused) nextMain(); }, MAIN_DELAY);
+      mainTimer = setInterval(() => { 
+        if (!mainPaused) nextMain(); 
+      }, MAIN_DELAY);
     }
   }
 
   function startMainAutoplay () {
     clearInterval(mainTimer);
-    mainTimer = setInterval(() => { if (!mainPaused) nextMain(); }, MAIN_DELAY);
+    mainTimer = setInterval(() => { 
+      if (!mainPaused) nextMain(); 
+    }, MAIN_DELAY);
   }
 
   if (btnNext) btnNext.addEventListener('click', nextMain);
   if (btnPrev) btnPrev.addEventListener('click', prevMain);
 
   indicators.forEach((dot, i) => {
-    dot.addEventListener('click', () => { goToMain(i); resetMainAutoplay(); });
+    dot.addEventListener('click', () => { 
+      goToMain(i); 
+      resetMainAutoplay(); 
+    });
   });
 
   /* Pausa ao hover */
@@ -323,14 +358,29 @@
     });
   }
 
+  /* Redimensionamento */
+  let resizeTimer;
   window.addEventListener('resize', () => {
-    carousel.style.transition = 'none';
-    goToMain(Math.min(mainIndex, maxIndex()));
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      carousel.style.transition = 'none';
+      goToMain(Math.min(mainIndex, getMaxIndex()));
+      // Restaura transição após redimensionamento
+      setTimeout(() => {
+        carousel.style.transition = 'transform .5s cubic-bezier(.4,0,.2,1)';
+      }, 50);
+    }, 150);
   });
 
+  /* Inicializa o carrossel */
+  carousel.style.display = 'flex';
   carousel.style.flexWrap = 'nowrap';
-  goToMain(0);
-  startMainAutoplay();
+  
+  // Força um reflow para garantir que os estilos sejam aplicados
+  setTimeout(() => {
+    goToMain(0);
+    startMainAutoplay();
+  }, 100);
 
   /* ================================================================
      Carrossel INTERNO de fotos por projeto (melhorado)
@@ -406,20 +456,6 @@
       if (timer) {
         clearInterval(timer);
         timer = null;
-      }
-    }
-
-    function enableAutoplay() {
-      autoPlayEnabled = true;
-      startAutoplay();
-    }
-
-    function disableAutoplay() {
-      autoPlayEnabled = false;
-      stopAutoplay();
-      if (fill) {
-        fill.style.transition = 'none';
-        fill.style.width = '0%';
       }
     }
 
